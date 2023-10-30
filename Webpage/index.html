@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Bureau en call ?</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #333;
+            color: #fff;
+        }
+
+        h1 {
+            color: #fff;
+        }
+
+        .office {
+            display: inline-block;
+            margin: 10px;
+        }
+
+        .power-switch {
+            width: 100px;
+            height: 50px;
+            border-radius: 25px;
+            background-color: #555;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .toggle {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            position: absolute;
+            top: 0;
+            transition: transform 0.2s;
+        }
+    </style>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mqtt/5.1.3/mqtt.min.js"></script>
+    <script>
+        var officeStatus = {
+            office1: true,
+            office2: true,
+            office3: true,
+            office4: true,
+            office5: true
+        };
+    </script>
+
+</head>
+<body>
+    <h1>Bureau en call ?</h1>
+    
+    <div class="office">
+        <div id="office1" onclick="toggleOffice('office1')">
+            <h2>Bureau 1</h2>
+            <div class="power-switch">
+                <div class="toggle"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="office">
+        <div id="office2" onclick="toggleOffice('office2')">
+            <h2>Bureau 2</h2>
+            <div class="power-switch">
+                <div class="toggle"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="office">
+        <div id="office3" onclick="toggleOffice('office3')">
+            <h2>Bureau 3</h2>
+            <div class="power-switch">
+                <div class="toggle"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="office">
+        <div id="office4" onclick="toggleOffice('office4')">
+            <h2>Bureau 4</h2>
+            <div class="power-switch">
+                <div class="toggle"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="office">
+        <div id="office5" onclick="toggleOffice('office5')">
+            <h2>Bureau 5</h2>
+            <div class="power-switch">
+                <div class="toggle"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Créer un client MQTT
+        var client = mqtt.connect('wss://test.mosquitto.org:8081');
+
+        // Gérer la connexion au broker MQTT
+        client.on('connect', function () {
+            console.log('Connecté au broker MQTT');
+            // Souscrire aux sujets MQTT pour chaque bureau et récupérer les messages retenus
+            for (var officeId in officeStatus) {
+                if (officeStatus.hasOwnProperty(officeId)) {
+                    (function(officeId) {
+                        client.subscribe(officeId + "/call", function (err) {
+                            if (!err) {
+                                console.log('Souscrit à', officeId + '/call');
+                            }
+                        });
+                    })(officeId);
+                }
+            }
+        });
+
+        // Gérer les erreurs de connexion
+        client.on('error', function (error) {
+            console.log('Erreur de connexion :', error);
+        });
+
+        // Gérer la déconnexion
+        client.on('offline', function () {
+            console.log('Déconnecté du broker MQTT');
+        });
+
+        // Gérer la réception de messages MQTT
+        client.on('message', function (topic, message) {
+            console.log('Message reçu sur le sujet', topic, ':', message.toString());
+            // Mettre à jour l'état du bureau en fonction du message reçu
+            updateOfficeStatus(topic, message.toString());
+        });
+
+        function toggleOffice(officeId) {
+            officeStatus[officeId] = !officeStatus[officeId];
+            updateToggleButton(officeId);
+            const message = officeStatus[officeId] ? "1" : "0";
+            
+            // Publier le message avec rétention (retain)
+            client.publish(officeId + "/call", message, { retain: true });
+        }
+
+        function updateOfficeStatus(topic, message) {
+            // Mettre à jour l'état du bureau en fonction du message reçu
+            const officeId = topic.split("/")[0];
+            officeStatus[officeId] = message === "1";
+            updateToggleButton(officeId);
+        }
+
+        function updateToggleButton(officeId) {
+            const toggle = document.querySelector("#" + officeId + " .toggle");
+            if (officeStatus[officeId]) {
+                toggle.style.transform = "translateX(50px)";
+                toggle.style.backgroundColor = "#4CD964";  // Vert pour "appel en cours"
+            } else {
+                toggle.style.transform = "translateX(0)";
+                toggle.style.backgroundColor = "#FF3B30";  // Rouge pour "aucun appel en cours"
+            }
+        }
+
+        // Initialiser l'état des bureaux
+        for (var officeId in officeStatus) {
+            if (officeStatus.hasOwnProperty(officeId)) {
+                updateToggleButton(officeId);
+            }
+        }
+    </script>
+</body>
+</html>
