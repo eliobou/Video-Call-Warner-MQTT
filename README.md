@@ -87,7 +87,7 @@ You can then go to the IP address of your Raspberry Pi in your browser and the w
 The code provided is meant to be open in the [Arduino IDE](https://www.arduino.cc/en/software).
 - Install the Adafruit_MQTT library
 - Select ESP32 Dev Module
-- Select the correct COM Port
+- Select the correct COM port
 - Update the Wifi and MQTT credentials where it is needed
 ```
 // Wifi informations
@@ -102,9 +102,12 @@ const char* password = "WIFI_PASSWORD"; // update this
 ```
 - Flash the code inside the ESP32
 
+You can check the logs on the console inside the IDE.
 
 ## Wiring
 
-// TODO add wiring diagram
+Connect a red LED to D12 on the ESP32 and a green LED to D13. Add a current limiting resistor of 330 ohms after them. You can use only one resistor if you light up only one LED at a time.
+
+![schematic](images/schematic.png)
 
 ![esp32](images/esp32.jpg)
