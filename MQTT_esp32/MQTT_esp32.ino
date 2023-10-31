@@ -2,6 +2,7 @@
 #include <Adafruit_MQTT.h>
 #include <Adafruit_MQTT_Client.h>
 
+// Wifi informations
 const char* ssid = "SSID"; // update this
 const char* password = "WIFI_PASSWORD"; // update this
 
