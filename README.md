@@ -58,12 +58,53 @@ sudo apt-get update
 sudo apt-get install lighttpd
 ```
 
-#### Download the necessary files
+#### Download and configure the necessary files
 [Download or clone this repo](https://geektechstuff.com/2019/09/09/introduction-to-github-raspberry-pi/) anywhere you want. Go in the downloaded directory.
 
 Place the index.html file inside the webpage folder of lighttpd (/var/www/html by default)
 ```
 sudo mv Webserver/index.html /var/www/html/
 ```
+Open the index.html file and edit the connection credentials with the ones you created before.
+```
+var client = mqtt.connect('ws://IP_ADDRESS:8081', { // update this
+    clientId: randomClientId,
+    username: 'USERNAME', // update this
+    password: 'PASSWORD', // update this
+});
+```
 
-You can go to the IP address of your Raspberry Pi in your browser and the webpage should load correctly
+You can find the IP address of the Raspberry Pi using :
+
+```
+hostname -I
+```
+
+You can then go to the IP address of your Raspberry Pi in your browser and the webpage should load correctly.
+
+## Upload the code to the ESP32
+
+The code provided is meant to be open in the [Arduino IDE](https://www.arduino.cc/en/software).
+- Install the Adafruit_MQTT library
+- Select ESP32 Dev Module
+- Select the correct COM Port
+- Update the Wifi and MQTT credentials where it is needed
+```
+// Wifi informations
+const char* ssid = "SSID"; // update this
+const char* password = "WIFI_PASSWORD"; // update this
+
+// MQTT Broker informations
+#define MQTT_SERVER "BROKER_ADRESS" // update this
+#define MQTT_PORT 1883 
+#define MQTT_USERNAME "USERNAME" // update this
+#define MQTT_PASSWORD "PASSWORD" // update this
+```
+- Flash the code inside the ESP32
+
+
+## Wiring
+
+// TODO add wiring diagram
+
+![esp32](images/esp32.jpg)
