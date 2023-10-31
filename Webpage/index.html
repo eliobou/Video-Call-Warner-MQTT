@@ -99,19 +99,39 @@
     </div>
 
     <script>
-        // Créer un client MQTT
-        var client = mqtt.connect('wss://test.mosquitto.org:8081');
+        // Generate a random ID
+        function generateRandomClientId() {
+            // Use random string of characters (eg : 10)
+            var clientId = '';
+            var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            for (var i = 0; i < 10; i++) {
+                var randomIndex = Math.floor(Math.random() * characters.length);
+                clientId += characters.charAt(randomIndex);
+            }
+            return clientId;
+        }
 
-        // Gérer la connexion au broker MQTT
+        // Use the random client ID
+        var randomClientId = generateRandomClientId();
+
+        // Create MQTT client
+        //var client = mqtt.connect('wss://test.mosquitto.org:8081');
+        var client = mqtt.connect('ws://192.168.1.182:8081', {
+            clientId: randomClientId,
+            username: 'pi',
+            password: '.4Dp1oneer5',
+        });
+
+        // Handle the connection to the MQTT broker
         client.on('connect', function () {
-            console.log('Connecté au broker MQTT');
-            // Souscrire aux sujets MQTT pour chaque bureau et récupérer les messages retenus
+            console.log('Connected to MQTT broker');
+            // Subscribe to MQTT topic for every office and get the messages
             for (var officeId in officeStatus) {
                 if (officeStatus.hasOwnProperty(officeId)) {
                     (function(officeId) {
                         client.subscribe(officeId + "/call", function (err) {
                             if (!err) {
-                                console.log('Souscrit à', officeId + '/call');
+                                console.log('Subscribe to', officeId + '/call');
                             }
                         });
                     })(officeId);
@@ -119,20 +139,20 @@
             }
         });
 
-        // Gérer les erreurs de connexion
+        // Handle connection errors
         client.on('error', function (error) {
-            console.log('Erreur de connexion :', error);
+            console.log('Connection error :', error);
         });
 
-        // Gérer la déconnexion
+        // Handle deconnections
         client.on('offline', function () {
             console.log('Déconnecté du broker MQTT');
         });
 
-        // Gérer la réception de messages MQTT
+        // Handle received MQTT messages
         client.on('message', function (topic, message) {
             console.log('Message reçu sur le sujet', topic, ':', message.toString());
-            // Mettre à jour l'état du bureau en fonction du message reçu
+            // Update office state
             updateOfficeStatus(topic, message.toString());
         });
 
@@ -141,12 +161,12 @@
             updateToggleButton(officeId);
             const message = officeStatus[officeId] ? "1" : "0";
             
-            // Publier le message avec rétention (retain)
+            // Publish message with retain
             client.publish(officeId + "/call", message, { retain: true });
         }
 
         function updateOfficeStatus(topic, message) {
-            // Mettre à jour l'état du bureau en fonction du message reçu
+            // Update office state
             const officeId = topic.split("/")[0];
             officeStatus[officeId] = message === "1";
             updateToggleButton(officeId);
@@ -163,7 +183,7 @@
             }
         }
 
-        // Initialiser l'état des bureaux
+        // Initialise office state
         for (var officeId in officeStatus) {
             if (officeStatus.hasOwnProperty(officeId)) {
                 updateToggleButton(officeId);
