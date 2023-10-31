@@ -18,8 +18,8 @@ Adafruit_MQTT_Client mqtt(&client, MQTT_SERVER, MQTT_PORT, MQTT_USERNAME, MQTT_P
 // Define MQTT client and topics
 Adafruit_MQTT_Subscribe statusSub = Adafruit_MQTT_Subscribe(&mqtt, "office1/call"); // update this
 
-const int redLedPin = 12;   // Broche de la LED rouge
-const int greenLedPin = 13; // Broche de la LED verte
+const int redLedPin = 12;   // red LED pin
+const int greenLedPin = 13; // green LED pin
 
 void setup() {
   Serial.begin(115200);
