@@ -161,7 +161,7 @@
 
         // Handle received MQTT messages
         client.on('message', function (topic, message) {
-            console.log('Message reçu sur le sujet', topic, ':', message.toString());
+            console.log('Message received on topic ', topic, ':', message.toString());
             // Update office state
             updateOfficeStatus(topic, message.toString());
         });
