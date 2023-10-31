@@ -45,7 +45,8 @@
             office2: true,
             office3: true,
             office4: true,
-            office5: true
+            office5: true,
+            office6: true
         };
     </script>
 
@@ -92,6 +93,15 @@
     <div class="office">
         <div id="office5" onclick="toggleOffice('office5')">
             <h2>Bureau 5</h2>
+            <div class="power-switch">
+                <div class="toggle"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="office">
+        <div id="office6" onclick="toggleOffice('office6')">
+            <h2>Bureau 6</h2>
             <div class="power-switch">
                 <div class="toggle"></div>
             </div>
@@ -146,7 +156,7 @@
 
         // Handle deconnections
         client.on('offline', function () {
-            console.log('Déconnecté du broker MQTT');
+            console.log('Disconnected from the MQTT broker');
         });
 
         // Handle received MQTT messages
@@ -159,7 +169,7 @@
         function toggleOffice(officeId) {
             officeStatus[officeId] = !officeStatus[officeId];
             updateToggleButton(officeId);
-            const message = officeStatus[officeId] ? "1" : "0";
+            const message = officeStatus[officeId] ? "0" : "1";
             
             // Publish message with retain
             client.publish(officeId + "/call", message, { retain: true });
@@ -168,7 +178,7 @@
         function updateOfficeStatus(topic, message) {
             // Update office state
             const officeId = topic.split("/")[0];
-            officeStatus[officeId] = message === "1";
+            officeStatus[officeId] = message === "0";
             updateToggleButton(officeId);
         }
 
@@ -176,10 +186,10 @@
             const toggle = document.querySelector("#" + officeId + " .toggle");
             if (officeStatus[officeId]) {
                 toggle.style.transform = "translateX(50px)";
-                toggle.style.backgroundColor = "#4CD964";  // Vert pour "appel en cours"
+                toggle.style.backgroundColor = "#4CD964";  // Green for no call
             } else {
                 toggle.style.transform = "translateX(0)";
-                toggle.style.backgroundColor = "#FF3B30";  // Rouge pour "aucun appel en cours"
+                toggle.style.backgroundColor = "#FF3B30";  // Red for call
             }
         }
 
