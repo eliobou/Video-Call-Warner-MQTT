@@ -40,16 +40,21 @@ void loop() {
   Adafruit_MQTT_Subscribe* subscription;
   while ((subscription = mqtt.readSubscription(1000))) {
     if (subscription == &statusSub) {
-      const String message = String(statusSub.lastread);
+      char message[subscription->datalen];
+      memcpy(message, (char*)subscription->lastread, subscription->datalen);
+      message[subscription->datalen] = '\0';
+
       Serial.print("Received message on topic [");
       Serial.print(statusSub.topic);
       Serial.print("] : ");
       Serial.println(message);
 
-      if (message == "1") {
+      String messageString(message);
+
+      if (messageString == "1") {
         digitalWrite(greenLedPin, LOW);
         digitalWrite(redLedPin, HIGH);
-      } else if (message == "0") {
+      } else if (messageString == "0") {
         digitalWrite(redLedPin, LOW);
         digitalWrite(greenLedPin, HIGH);
       }
@@ -71,7 +76,6 @@ void connectToMQTT() {
   while ((ret = mqtt.connect()) != 0) {
     Serial.println(mqtt.connectErrorString(ret));
     Serial.println("Trying to connect to MQTT...");
-    delay(5000); // wait 5s before retry
+    delay(5000);  // wait 5s before retry
   }
   Serial.println("Connected to MQTT broker");
-}
