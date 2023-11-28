@@ -6,6 +6,8 @@ This project make it possible to tell your coworkers if they can enter your offi
 
 You can select on a webpage if the office is free or not and it lights up the corresponding light next to your door.
 
+![box](images/box.jpeg)
+
 ## Getting started
 
 ### Prerequisite
@@ -111,3 +113,7 @@ Connect a red LED to D12 on the ESP32 and a green LED to D13. Add a current limi
 ![schematic](images/schematic.png)
 
 ![esp32](images/esp32.jpg)
+
+## 3D Printing Box
+
+You can find the 3D STL files if you want to 3D print this box. It uses M3 screws, M3 tap and 5mm LEDs.
